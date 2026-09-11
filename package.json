@@ -1,0 +1,15 @@
+{
+  "name": "parana-crecidas",
+  "version": "0.1.0",
+  "description": "Monitor de crecidas del río Paraná y la Cuenca del Plata ante El Niño",
+  "type": "module",
+  "private": true,
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "collect": "node scripts/collect.mjs",
+    "climatology": "node scripts/build-climatology.mjs",
+    "geo": "node scripts/build-geo.mjs",
+    "dev": "npx --yes serve public -l 5173",
+    "test": "node --test test/*.test.mjs"
+  }
+}

@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Monitor del Niño</title>
+<meta name="description" content="Monitor de crecidas del río Paraná y la Cuenca del Plata ante El Niño: alturas de Prefectura e INA, índices ENSO de NOAA, caudal pronosticado GloFAS y lluvia prevista.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Figtree:ital,wght@0,400..700;1,400..700&family=JetBrains+Mono:wght@400..700&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<!--APP-->
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <svg class="brand-mark" viewBox="0 0 28 40" aria-hidden="true"><rect x="1" y="1" width="12" height="38" rx="4" class="bm-staff"/><g class="bm-ticks"><rect x="1" y="5" width="12" height="2"/><rect x="1" y="13" width="7" height="2"/><rect x="1" y="21" width="12" height="2"/><rect x="1" y="29" width="7" height="2"/></g><path d="M0 27 Q7 24 14 27 T28 27" class="bm-water"/></svg>
+      <div>
+        <h1>Monitor del Niño</h1>
+        <p class="tag">Crecidas del Paraná · Cuenca del Plata</p>
+      </div>
+    </div>
+    <div class="top-meta">
+      <p class="updated" id="updated">Cargando datos…</p>
+      <ul class="sources" id="sources" aria-label="Estado de las fuentes"></ul>
+    </div>
+  </header>
+
+  <section class="summary" aria-label="Resumen">
+    <article class="panel risk" id="risk">
+      <h2 class="eyebrow">Índice de riesgo de crecida</h2>
+      <div class="risk-body">
+        <div class="risk-gauge" id="riskGauge" aria-hidden="true"></div>
+        <div class="risk-read">
+          <p class="risk-score"><span id="riskScore">–</span><small>/100</small></p>
+          <p class="risk-level" id="riskLevel">–</p>
+          <ul class="components" id="riskComponents"></ul>
+        </div>
+      </div>
+    </article>
+
+    <article class="panel enso">
+      <div class="panel-head">
+        <h2 class="eyebrow">El Niño · Niño 3.4</h2>
+        <span class="chip" id="ensoStatus">–</span>
+      </div>
+      <div class="enso-figures">
+        <div><p class="big" id="n34">–</p><p class="lbl" id="n34lbl">anomalía semanal</p></div>
+        <div><p class="big" id="oni">–</p><p class="lbl" id="onilbl">ONI trimestral</p></div>
+      </div>
+      <div class="chart" id="ensoChart"></div>
+      <p class="note" id="ensoNote"></p>
+    </article>
+
+    <article class="panel insights">
+      <h2 class="eyebrow">Qué está pasando</h2>
+      <ul id="insights" class="insight-list"></ul>
+    </article>
+  </section>
+
+  <section class="main">
+    <article class="panel map-panel">
+      <div class="panel-head">
+        <h2>Ríos de la Cuenca del Plata</h2>
+        <div class="seg-toggle" role="group" aria-label="Capa del mapa">
+          <button type="button" id="layerObs" class="on" aria-pressed="true">Nivel observado</button>
+          <button type="button" id="layerFc" aria-pressed="false">Caudal a 30 días</button>
+        </div>
+      </div>
+      <div class="map-wrap">
+        <svg id="map" role="img" aria-label="Mapa de la Cuenca del Plata con ríos coloreados según su estado"></svg>
+        <div class="tooltip" id="tip" hidden></div>
+      </div>
+      <ul class="legend" id="legend"></ul>
+      <p class="note" id="mapNote">Tramos coloreados por la estación o nodo de modelo más cercano. Círculos: escalas hidrométricas (Prefectura/INA). Rombos: nodos del modelo GloFAS.</p>
+    </article>
+
+    <article class="panel stations">
+      <div class="panel-head">
+        <h2>Escalas hidrométricas</h2>
+        <label class="select"><span class="sr">Río</span>
+          <select id="riverFilter">
+            <option value="principal">Paraná argentino</option>
+            <option value="parana-alto">Alto Paraná</option>
+            <option value="paraguay">Paraguay</option>
+            <option value="iguazu">Iguazú</option>
+            <option value="uruguay">Uruguay</option>
+            <option value="parana-delta">Delta</option>
+            <option value="todas">Todas</option>
+          </select>
+        </label>
+      </div>
+      <p class="note staff-key"><span class="k k-level"></span>altura actual <span class="k k-alert"></span>alerta <span class="k k-evac"></span>evacuación</p>
+      <ol class="staff-list" id="stationList"></ol>
+    </article>
+  </section>
+
+  <section class="forecast">
+    <article class="panel flows">
+      <div class="panel-head">
+        <h2>Caudal modelado y pronóstico</h2>
+        <p class="note inline">GloFAS v4 · 30 días atrás y 45 adelante · banda gris: percentiles 50–90 históricos</p>
+      </div>
+      <div class="flow-grid" id="flowGrid"></div>
+    </article>
+
+    <article class="panel rain">
+      <div class="panel-head">
+        <h2>Lluvia prevista</h2>
+        <p class="note inline">Acumulado 16 días · mm</p>
+      </div>
+      <ol class="rain-list" id="rainList"></ol>
+    </article>
+  </section>
+
+  <section class="lower">
+    <article class="panel history">
+      <div class="panel-head">
+        <h2>Evolución reciente</h2>
+        <p class="note inline">Altura en escalas de referencia (m)</p>
+      </div>
+      <div class="chart" id="historyChart"></div>
+      <ul class="legend small" id="historyLegend"></ul>
+    </article>
+    <article class="panel ina">
+      <h2>Perspectiva del INA</h2>
+      <p class="note" id="inaDate"></p>
+      <div id="inaText" class="prose"></div>
+    </article>
+  </section>
+
+  <footer class="foot">
+    <div class="method">
+      <h2>Cómo se calcula</h2>
+      <p>El índice combina cinco señales, cada una llevada a una escala 0–1: <b>anomalía Niño 3.4</b> (0 con +0,5 °C, 1 con +2,0 °C; peso 25 %), <b>altura actual</b> respecto del nivel de alerta en escalas de referencia del Paraná (20 %), <b>tendencia</b> de esas escalas (10 %), <b>caudal pronosticado a 30 días</b> por GloFAS expresado como percentil histórico (30 %) y <b>lluvia prevista a 16 días</b> en la alta cuenca (15 %). Si una fuente falla, su peso se redistribuye.</p>
+      <p>Es un indicador orientativo elaborado con datos públicos. <b>No reemplaza los avisos oficiales</b> del INA, el SMN, Prefectura Naval ni Defensa Civil.</p>
+    </div>
+    <div class="credits">
+      <h2>Fuentes</h2>
+      <ul>
+        <li><a href="https://contenidosweb.prefecturanaval.gob.ar/alturas/">Prefectura Naval Argentina — Estado de los ríos</a></li>
+        <li><a href="https://alerta.ina.gob.ar/a5/diario/reporte_diario">INA — Reporte diario Cuenca del Plata</a></li>
+        <li><a href="https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/enso_advisory/ensodisc.shtml">NOAA CPC — ENSO</a></li>
+        <li><a href="https://open-meteo.com/en/docs/flood-api">Open-Meteo — Flood API (GloFAS, Copernicus EMS)</a> y Forecast API</li>
+        <li>Cartografía: Natural Earth (dominio público)</li>
+      </ul>
+    </div>
+  </footer>
+</div>
+<script src="app.js"></script>
+<!--/APP-->
+</body>
+</html>
