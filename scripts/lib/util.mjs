@@ -56,6 +56,27 @@ export function tableRows(html) {
   return rows;
 }
 
+const stripMd = (s) =>
+  String(s)
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, '')
+    .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')
+    .replace(/\*\*(.*?)\*\*/g, '$1')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+// Extrae filas de una tabla en formato Markdown (| celda | celda |) como arrays de texto
+export function mdTableRows(md) {
+  const rows = [];
+  for (const line of md.split('\n')) {
+    const t = line.trim();
+    if (!t.startsWith('|') || !t.endsWith('|')) continue;
+    const raw = t.slice(1, -1).split('|').map((c) => c.trim());
+    if (raw.every((c) => /^:?-+:?$/.test(c))) continue; // fila separadora del header
+    rows.push(raw.map(stripMd));
+  }
+  return rows;
+}
+
 export const num = (s) => {
   if (s == null) return null;
   const t = String(s).trim().replace(',', '.');

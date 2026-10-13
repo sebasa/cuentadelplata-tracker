@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { parsePrefectura, parsePnaDate } from '../scripts/sources/prefectura.mjs';
+import { parsePrefectura, parsePrefecturaMarkdown, parsePnaDate } from '../scripts/sources/prefectura.mjs';
 import { parseINA } from '../scripts/sources/ina.mjs';
 import { parseONI, parseWeekly, parseDiscussion } from '../scripts/sources/noaa.mjs';
 import { percentileOf, summarizeFlood, summarizeRain } from '../scripts/sources/openmeteo.mjs';
@@ -17,6 +17,17 @@ test('fecha Prefectura', () => {
 
 test('parser Prefectura', () => {
   const r = parsePrefectura(fx('prefectura.html'));
+  assert.equal(r.length, 7);
+  const c = r.find((s) => s.id === 'CORRIENTES');
+  assert.deepEqual([c.level, c.change, c.trend, c.alert, c.evac], [3.06, -0.04, 'baja', 6.5, 7]);
+  const p = r.find((s) => s.id === 'PILCOMAYO');
+  assert.equal(p.level, null);
+  assert.equal(r.find((s) => s.id === 'BARADERO').trend, 'estacionario');
+  assert.equal(r.find((s) => s.id === 'REPRESA ITAIPU (BRASIL)').alert, null);
+});
+
+test('parser Prefectura (proxy Markdown)', () => {
+  const r = parsePrefecturaMarkdown(fx('prefectura.md'));
   assert.equal(r.length, 7);
   const c = r.find((s) => s.id === 'CORRIENTES');
   assert.deepEqual([c.level, c.change, c.trend, c.alert, c.evac], [3.06, -0.04, 'baja', 6.5, 7]);

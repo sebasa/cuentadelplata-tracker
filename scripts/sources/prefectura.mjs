@@ -1,9 +1,12 @@
 // Prefectura Naval Argentina — Registro del estado de los ríos
 // Columnas: Puerto | Río | Últ. registro | Variación | Período | Fecha Hora | Estado | (ícono) | Registro anterior | Fecha anterior | Alerta | Evacuación | Hist.
-import { fetchText, tableRows, num } from '../lib/util.mjs';
+import { fetchText, tableRows, mdTableRows, num } from '../lib/util.mjs';
 import { STATIONS, normalizeName } from '../stations.mjs';
 
 export const URL_PNA = 'https://contenidosweb.prefecturanaval.gob.ar/alturas/';
+// El WAF de Prefectura bloquea rangos de IP de nubes/CI (p.ej. GitHub Actions); como
+// respaldo se pide la misma página a través de un proxy de lectura que la devuelve en Markdown.
+export const URL_PNA_PROXY = `https://r.jina.ai/${URL_PNA}`;
 const MESES = { ENE: 1, JAN: 1, FEB: 2, MAR: 3, ABR: 4, APR: 4, MAY: 5, JUN: 6, JUL: 7, AGO: 8, AUG: 8, SEP: 9, SET: 9, OCT: 10, NOV: 11, DIC: 12, DEC: 12 };
 
 // "11/SEP/26 - 0900" -> ISO en hora argentina (UTC-3)
@@ -18,8 +21,7 @@ export function parsePnaDate(s) {
   return `${year}-${pad(month)}-${pad(d)}T${hh}:${mm}:00-03:00`;
 }
 
-export function parsePrefectura(html) {
-  const rows = tableRows(html);
+function rowsToStations(rows) {
   const header = rows.findIndex((r) => r.some((c) => /puerto/i.test(c)) && r.some((c) => /alerta/i.test(c)));
   if (header < 0) throw new Error('Prefectura: no se encontró la tabla de alturas');
   const out = [];
@@ -47,7 +49,25 @@ export function parsePrefectura(html) {
   return out;
 }
 
+export function parsePrefectura(html) {
+  return rowsToStations(tableRows(html));
+}
+
+// Mismo formato de tabla, servido en Markdown por el proxy de respaldo
+export function parsePrefecturaMarkdown(md) {
+  return rowsToStations(mdTableRows(md));
+}
+
 export async function getPrefectura() {
-  const html = await fetchText(URL_PNA, { timeout: 45000 });
-  return parsePrefectura(html);
+  try {
+    const html = await fetchText(URL_PNA, { timeout: 45000 });
+    return parsePrefectura(html);
+  } catch (direct) {
+    try {
+      const md = await fetchText(URL_PNA_PROXY, { timeout: 45000, retries: 1 });
+      return parsePrefecturaMarkdown(md);
+    } catch (viaProxy) {
+      throw new Error(`fetch directo falló (${direct.message}); vía proxy también falló (${viaProxy.message})`);
+    }
+  }
 }
