@@ -1,5 +1,7 @@
 // Catálogo de estaciones hidrométricas (claves = nombre de Prefectura normalizado)
 // seg: tramo del mapa que colorea la estación. key: estación de referencia para el índice.
+// siyahId: id de estación en la API pública de INA (alerta.ina.gob.ar/a5), usado por
+// build-siyah-history.mjs para completar el historial con series largas.
 // Coordenadas aproximadas (puerto / escala hidrométrica).
 export const STATIONS = {
   // Río Iguazú
@@ -15,31 +17,31 @@ export const STATIONS = {
   'LIBERTADOR': { name: 'Libertador Gral. San Martín', lat: -26.80, lon: -55.05, seg: 'parana-alto' },
   'PUERTO MANI': { name: 'Puerto Maní', lat: -27.20, lon: -55.45, seg: 'parana-alto' },
   'SANTA ANA': { name: 'Santa Ana', lat: -27.37, lon: -55.58, seg: 'parana-alto' },
-  'POSADAS': { name: 'Posadas', lat: -27.36, lon: -55.89, seg: 'parana-alto', key: true },
+  'POSADAS': { name: 'Posadas', lat: -27.36, lon: -55.89, seg: 'parana-alto', key: true, siyahId: 14 },
   'ITUZAINGO': { name: 'Ituzaingó', lat: -27.59, lon: -56.68, seg: 'parana-alto' },
   'ITA IBATE': { name: 'Itá Ibaté', lat: -27.43, lon: -57.34, seg: 'parana-alto' },
   'ITATI': { name: 'Itatí', lat: -27.27, lon: -58.24, seg: 'parana-alto' },
   'PASO DE LA PATRIA': { name: 'Paso de la Patria', lat: -27.32, lon: -58.57, seg: 'parana-alto' },
   // Paraná medio e inferior
-  'CORRIENTES': { name: 'Corrientes', lat: -27.47, lon: -58.84, seg: 'parana-bajo', key: true },
+  'CORRIENTES': { name: 'Corrientes', lat: -27.47, lon: -58.84, seg: 'parana-bajo', key: true, siyahId: 19 },
   'BARRANQUERAS': { name: 'Barranqueras', lat: -27.48, lon: -58.94, seg: 'parana-bajo' },
   'EMPEDRADO': { name: 'Empedrado', lat: -27.95, lon: -58.81, seg: 'parana-bajo' },
   'BELLA VISTA': { name: 'Bella Vista', lat: -28.51, lon: -59.05, seg: 'parana-bajo' },
-  'GOYA': { name: 'Goya', lat: -29.14, lon: -59.26, seg: 'parana-bajo', key: true },
-  'RECONQUISTA': { name: 'Reconquista', lat: -29.23, lon: -59.60, seg: 'parana-bajo', key: true },
+  'GOYA': { name: 'Goya', lat: -29.14, lon: -59.26, seg: 'parana-bajo', key: true, siyahId: 23 },
+  'RECONQUISTA': { name: 'Reconquista', lat: -29.23, lon: -59.60, seg: 'parana-bajo', key: true, siyahId: 24 },
   'ESQUINA': { name: 'Esquina', lat: -30.01, lon: -59.53, seg: 'parana-bajo' },
   'SAN JAVIER (SANTA FE)': { name: 'San Javier (SF)', lat: -30.58, lon: -59.93, seg: 'parana-bajo' },
-  'LA PAZ': { name: 'La Paz', lat: -30.74, lon: -59.65, seg: 'parana-bajo', key: true },
+  'LA PAZ': { name: 'La Paz', lat: -30.74, lon: -59.65, seg: 'parana-bajo', key: true, siyahId: 26 },
   'SANTA ELENA': { name: 'Santa Elena', lat: -30.95, lon: -59.80, seg: 'parana-bajo' },
   'HERNANDARIAS': { name: 'Hernandarias', lat: -31.23, lon: -59.99, seg: 'parana-bajo' },
-  'PARANA': { name: 'Paraná', lat: -31.72, lon: -60.52, seg: 'parana-bajo', key: true },
-  'SANTA FE': { name: 'Santa Fe', lat: -31.65, lon: -60.70, seg: 'parana-bajo', key: true },
+  'PARANA': { name: 'Paraná', lat: -31.72, lon: -60.52, seg: 'parana-bajo', key: true, siyahId: 29 },
+  'SANTA FE': { name: 'Santa Fe', lat: -31.65, lon: -60.70, seg: 'parana-bajo', key: true, siyahId: 30 },
   'DIAMANTE': { name: 'Diamante', lat: -32.07, lon: -60.64, seg: 'parana-bajo' },
   'VICTORIA': { name: 'Victoria', lat: -32.62, lon: -60.15, seg: 'parana-bajo' },
   'SAN LORENZO': { name: 'San Lorenzo', lat: -32.75, lon: -60.73, seg: 'parana-bajo' },
-  'ROSARIO': { name: 'Rosario', lat: -32.95, lon: -60.63, seg: 'parana-bajo', key: true },
+  'ROSARIO': { name: 'Rosario', lat: -32.95, lon: -60.63, seg: 'parana-bajo', key: true, siyahId: 34 },
   'VILLA CONSTITUCION': { name: 'Villa Constitución', lat: -33.23, lon: -60.33, seg: 'parana-delta' },
-  'SAN NICOLAS': { name: 'San Nicolás', lat: -33.33, lon: -60.21, seg: 'parana-delta', key: true },
+  'SAN NICOLAS': { name: 'San Nicolás', lat: -33.33, lon: -60.21, seg: 'parana-delta', key: true, siyahId: 36 },
   'RAMALLO': { name: 'Ramallo', lat: -33.48, lon: -60.00, seg: 'parana-delta' },
   'SAN PEDRO': { name: 'San Pedro', lat: -33.68, lon: -59.66, seg: 'parana-delta' },
   'BARADERO': { name: 'Baradero', lat: -33.81, lon: -59.50, seg: 'parana-delta' },
@@ -60,7 +62,7 @@ export const STATIONS = {
   // Río Paraguay
   'PILCOMAYO': { name: 'Puerto Pilcomayo', lat: -25.37, lon: -57.65, seg: 'paraguay' },
   'BOUVIER': { name: 'Puerto Bouvier', lat: -25.85, lon: -57.93, seg: 'paraguay' },
-  'FORMOSA': { name: 'Formosa', lat: -26.18, lon: -58.17, seg: 'paraguay', key: true },
+  'FORMOSA': { name: 'Formosa', lat: -26.18, lon: -58.17, seg: 'paraguay', key: true, siyahId: 57 },
   'BERMEJO': { name: 'Puerto Bermejo', lat: -26.93, lon: -58.51, seg: 'paraguay' },
   'LAS PALMAS': { name: 'Las Palmas', lat: -27.07, lon: -58.68, seg: 'paraguay' },
   'ISLA DEL CERRITO': { name: 'Isla del Cerrito', lat: -27.29, lon: -58.61, seg: 'paraguay' },

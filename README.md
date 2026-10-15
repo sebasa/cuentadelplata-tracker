@@ -20,11 +20,12 @@ El mapa SVG (Natural Earth, dominio público) colorea cada tramo según la escal
 public/               sitio estático (index.html, styles.css, app.js)
 public/data/          latest.json · history.json · geo.json · climatology.json
 scripts/collect.mjs   colector principal
-scripts/sources/      un módulo por fuente (prefectura, ina, noaa, openmeteo)
+scripts/sources/      un módulo por fuente (prefectura, ina, noaa, openmeteo, siyah)
 scripts/lib/risk.mjs  estados por estación, índice compuesto y observaciones
 scripts/stations.mjs  catálogo de escalas, nodos GloFAS y zonas de lluvia
-scripts/build-climatology.mjs  percentiles históricos de caudal (una vez)
-scripts/build-geo.mjs          genera geo.json del mapa
+scripts/build-climatology.mjs    percentiles históricos de caudal (una vez)
+scripts/build-siyah-history.mjs  backfill de historial con series largas de INA (una vez)
+scripts/build-geo.mjs            genera geo.json del mapa
 test/                 tests de parsers con fixtures (node --test)
 ```
 
@@ -35,6 +36,7 @@ Requiere Node 20+ y no tiene dependencias.
 ```bash
 npm test               # tests de parsers
 npm run climatology    # una sola vez: ~10 min (respeta límites de Open-Meteo)
+npm run siyah          # una sola vez: completa el historial con ~2 años de series de INA
 npm run collect        # baja todas las fuentes → public/data/latest.json
 npm run dev            # http://localhost:5173
 ```
@@ -63,10 +65,17 @@ Estado por escala: normal < 70 % del alerta · atención 70–85 % · pre-alerta
 
 ## Ideas para seguir
 
-- Sumar alturas del **SNIH** (Base de Datos Hidrológica Integrada) y del **SIyAH/INA** vía WaterML para series largas.
-- Agregar niveles de Itaipú/Yacyretá (erogación) y **ANA Brasil** (HidroWeb) aguas arriba.
+- ~~Sumar alturas del SNIH/SIyAH (INA) vía series largas.~~ Hecho: `npm run siyah` completa `history.json`
+  con ~2 años reales por estación de referencia usando la API pública de INA (`alerta.ina.gob.ar/a5`,
+  estaciones con `siyahId` en `scripts/stations.mjs`). El colector diario sigue sumando los días nuevos.
+- Agregar niveles de Itaipú/Yacyretá (erogación) y **ANA Brasil** (HidroWeb) aguas arriba. Itaipú y
+  Guaíra ya están cubiertos vía Prefectura + GloFAS; falta específicamente Yacyretá (su sitio, eby.gov.ar,
+  no respondió en las pruebas — podría tener el mismo bloqueo de IP que tuvo Prefectura). La propia API
+  de INA ya expone "YACYRETA AFLUENTE/EFLUENTE" como estaciones, así que es el camino más corto.
 - Alertas por Telegram/WhatsApp cuando una escala pasa a pre-alerta o el índice sube de nivel.
 - Mapas de cota IGN por barrio (Santa Fe, Rosario, Corrientes) cruzados con la altura pronosticada.
+  Requiere datos de elevación (DEM) del IGN y una lógica hidráulica simplificada; es un proyecto de
+  GIS en sí mismo, más grande que el resto de esta lista.
 
 ## Licencias de datos
 
